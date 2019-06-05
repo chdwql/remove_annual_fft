@@ -1,5 +1,6 @@
 import pandas as pd
 from numpy import pi, sin, cos
+import numpy as np
 
 
 def harmonic_analysis(df, order):
@@ -21,9 +22,21 @@ def my_harmonic(df):
     c = []
     for i in range(T):
         c.append(cos(2 * pi * (i + 1) / T))
+    c = pd.DataFrame(c)
+    df['FITTING'] = df['OBSVALUE'] * c
 
-    df['OBSVALUE'] * c
+    return df
 
 
 def rolling_fft(df):
-    df.rolling(window=365, on='OBSVALUE').apply()
+    df.rolling(window=365, on='OBSVALUE').apply(my_harmonic)
+
+
+a = []
+for i in range(365 * 10):
+    a.append(10 * sin(2 * pi * i / 365) + 3*np.random.rand())
+
+df_a = pd.DataFrame(a)
+df_a.columns = ['OBSVALUE']
+df_a.index = pd.date_range(start='2000-01-01', periods=10 * 365)
+rolling_fft(df_a)
