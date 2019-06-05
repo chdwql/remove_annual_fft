@@ -17,26 +17,17 @@ def harmonic_analysis(df, order):
     return df
 
 
-def my_harmonic(df):
+def my_harmonic(s):
     T = 365
     c = []
     for i in range(T):
         c.append(cos(2 * pi * (i + 1) / T))
-    c = pd.DataFrame(c)
-    df['FITTING'] = df['OBSVALUE'] * c
-
-    return df
+    np.array(c)
+    s = s * c
+    f = s.sum() / T * 2.0
+    return f
 
 
 def rolling_fft(df):
-    df.rolling(window=365, on='OBSVALUE').apply(my_harmonic)
-
-
-a = []
-for i in range(365 * 10):
-    a.append(10 * sin(2 * pi * i / 365) + 3*np.random.rand())
-
-df_a = pd.DataFrame(a)
-df_a.columns = ['OBSVALUE']
-df_a.index = pd.date_range(start='2000-01-01', periods=10 * 365)
-rolling_fft(df_a)
+    df['FITTING'] = pd.Series.rolling(df['OBSVALUE'], window=365).apply(my_harmonic, raw=True)
+    return df
