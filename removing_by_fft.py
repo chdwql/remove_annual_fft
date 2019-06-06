@@ -29,5 +29,21 @@ def my_harmonic(s):
 
 
 def rolling_fft(df):
-    df['FITTING'] = pd.Series.rolling(df['OBSVALUE'], window=365).apply(my_harmonic, raw=True)
+    df.fillna(method='bfill', inplace=True)
+    df['FITTING'] = pd.Series.rolling(df['OBSVALUE'], window=365, center=False).apply(my_harmonic, raw=True)
+    df['FITTING'] = df['FITTING'] + df['OBSVALUE'].mean()
     return df
+
+
+df = pd.read_hdf('mls-res.h5', 'table')
+ns = df[df['ITEMID'] == '3211'].resample('D').median()
+# ns_f = rolling_fft(ns)
+# ns_f.plot()
+#
+# ew = df[df['ITEMID'] == '3212'].resample('D').median()
+# ew_f = rolling_fft(ew)
+# ew_f.plot()
+
+ns = harmonic_analysis(ns, 100)
+ns.drop('IND', axis=1, inplace=True)
+ns.plot()
