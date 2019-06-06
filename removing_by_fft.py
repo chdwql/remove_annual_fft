@@ -1,5 +1,5 @@
 import pandas as pd
-from numpy import pi, sin, cos
+from numpy import pi, sin, cos, ceil
 import numpy as np
 
 
@@ -37,13 +37,15 @@ def rolling_fft(df):
 
 df = pd.read_hdf('mls-res.h5', 'table')
 ns = df[df['ITEMID'] == '3211'].resample('D').median()
-# ns_f = rolling_fft(ns)
-# ns_f.plot()
-#
-# ew = df[df['ITEMID'] == '3212'].resample('D').median()
-# ew_f = rolling_fft(ew)
-# ew_f.plot()
+ew = df[df['ITEMID'] == '3212'].resample('D').median()
 
-ns = harmonic_analysis(ns, 100)
-ns.drop('IND', axis=1, inplace=True)
-ns.plot()
+# 频率1 / t = k / N / T
+# T为采样周期，这里T=1天
+# N为采样长度，N = df.shape[0]
+# k为阶数，t = 365
+t = 365
+N = ns.shape[0]
+k = N / t
+ew = harmonic_analysis(ew, int(ceil(k)))
+ew.drop('IND', axis=1, inplace=True)
+ew.plot()
